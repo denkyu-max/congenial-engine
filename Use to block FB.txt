@@ -1,4 +1,5 @@
 #Use to block FB
+0.0.0.0 m.facebook.com
 0.0.0.0 apps.facebook.com
 0.0.0.0 connect.facebook.net
 0.0.0.0 facebook.com
