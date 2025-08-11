@@ -30,10 +30,17 @@
         #auth-status {
             text-align: center;
             padding: 10px;
-            background-color: #e9f5e9;
-            border: 1px solid #d4ead4;
             border-radius: 5px;
             margin-bottom: 20px;
+        }
+        #auth-status.success {
+            background-color: #e9f5e9;
+            border: 1px solid #d4ead4;
+        }
+        #auth-status.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
         }
         #recipes-list {
             display: grid;
@@ -92,6 +99,7 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const authStatus = document.getElementById('auth-status');
 
         // Pi SDK Initialization and User Authentication
         async function authenticateUser() {
@@ -99,15 +107,24 @@
                 await Pi.init({ version: "2.0" });
                 const user = await Pi.authenticate();
                 
-                const authStatus = document.getElementById('auth-status');
+                authStatus.className = 'success';
                 authStatus.innerHTML = `<p>Hello, ${user.username}! You are successfully authenticated.</p>`;
 
                 console.log("User authenticated:", user);
 
             } catch (error) {
                 console.error("Pi authentication failed:", error);
-                const authStatus = document.getElementById('auth-status');
-                authStatus.innerHTML = `<p style="color: red;">Authentication failed. Please open this app in the Pi Browser.</p>`;
+                authStatus.className = 'error';
+
+                // Check for a specific error from the Pi SDK
+                if (error.name === "InvalidPlatformError") {
+                    authStatus.innerHTML = `<p>Authentication failed: This app must be opened in the Pi Browser.</p>`;
+                } else if (error.name === "UserCancelledAuthentication") {
+                    authStatus.innerHTML = `<p>Authentication was cancelled by the user. Please try again.</p>`;
+                } else {
+                    // This will catch any other error, including network issues or SDK bugs
+                    authStatus.innerHTML = `<p>An unknown authentication error occurred. Your app functionality may be limited.</p>`;
+                }
             }
         }
         
