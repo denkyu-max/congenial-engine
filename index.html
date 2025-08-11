@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pi Eats</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        h1 {
+            color: #333;
+        }
+        #auth-status {
+            text-align: center;
+            padding: 10px;
+            background-color: #e9f5e9;
+            border: 1px solid #d4ead4;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        #recipes-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .recipe-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #fafafa;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .recipe-card h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Welcome to Pi Eats!</h1>
+            <p>Your community for sharing and discovering delicious recipes.</p>
+        </header>
+        
+        <div id="auth-status">
+            <p>Authenticating with Pi Network...</p>
+        </div>
+
+        <section id="recipes-list">
+            </section>
+    </div>
+
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    
+    <script>
+        // Pi SDK Initialization and User Authentication
+        async function authenticateUser() {
+            try {
+                // Initialize the Pi SDK
+                await Pi.init({ version: "2.0" });
+                
+                // Request user authentication
+                const user = await Pi.authenticate();
+                
+                // If successful, display the user's name
+                const authStatus = document.getElementById('auth-status');
+                authStatus.innerHTML = `<p>Hello, ${user.username}! You are successfully authenticated.</p>`;
+
+                console.log("User authenticated:", user);
+
+                // Now you can proceed with other app logic, like fetching recipes.
+
+            } catch (error) {
+                // Handle errors during authentication
+                console.error("Pi authentication failed:", error);
+                const authStatus = document.getElementById('auth-status');
+                authStatus.innerHTML = `<p style="color: red;">Authentication failed. Please open this app in the Pi Browser.</p>`;
+            }
+        }
+        
+        // Call the authentication function when the page loads
+        authenticateUser();
+    </script>
+
+</body>
+</html>
