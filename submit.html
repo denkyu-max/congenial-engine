@@ -122,9 +122,30 @@
         </nav>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    
     <script>
-        document.getElementById('recipeForm').addEventListener('submit', function(event) {
+        // Your Firebase project configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB9FqSIurlifppOEVg3wZ0JEuQI_XcRWtQ",
+            authDomain: "pieats.firebaseapp.com",
+            projectId: "pieats",
+            storageBucket: "pieats.firebasestorage.app",
+            messagingSenderId: "986098785702",
+            appId: "1:986098785702:web:57d5bb15344222f3378367",
+            measurementId: "G-QJQ338R318"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        document.getElementById('recipeForm').addEventListener('submit', async function(event) {
             event.preventDefault(); // Prevents the form from submitting normally
+            
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.style.display = 'none';
 
             const recipeTitle = document.getElementById('recipeTitle').value;
             const ingredients = document.getElementById('ingredients').value.split('\n').filter(i => i.trim() !== '');
@@ -136,25 +157,24 @@
                 instructions: instructions
             };
 
-            // Get existing recipes from local storage or initialize an empty array
-            let recipes = JSON.parse(localStorage.getItem('recipes')) || [];
-            
-            // Add the new recipe to the array
-            recipes.push(newRecipe);
-            
-            // Save the updated array back to local storage
-            localStorage.setItem('recipes', JSON.stringify(recipes));
+            try {
+                // Add the new recipe to the 'recipes' collection in Firestore
+                const docRef = await db.collection("recipes").add(newRecipe);
+                console.log("Document written with ID: ", docRef.id);
+                
+                statusMessage.style.display = 'block';
+                statusMessage.className = 'message success';
+                statusMessage.innerHTML = 'Recipe submitted successfully!';
+                
+                // Clear the form after a successful submission
+                document.getElementById('recipeForm').reset();
 
-            const statusMessage = document.getElementById('statusMessage');
-            statusMessage.style.display = 'block';
-            statusMessage.className = 'message success';
-            statusMessage.innerHTML = 'Recipe submitted successfully!';
-            
-            // Clear the form after a successful submission
-            document.getElementById('recipeForm').reset();
-            
-            // You could also redirect back to the home page after submission
-            // window.location.href = "index.html";
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                statusMessage.style.display = 'block';
+                statusMessage.className = 'message error';
+                statusMessage.innerHTML = 'Error submitting recipe. Please try again.';
+            }
         });
     </script>
 </body>
