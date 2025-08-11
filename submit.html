@@ -136,18 +136,25 @@
                 instructions: instructions
             };
 
-            // In a real application, you would send this 'newRecipe' object
-            // to a backend server. For now, we'll just log it to the console
-            // and show a success message.
-            console.log("New Recipe Submitted:", newRecipe);
+            // Get existing recipes from local storage or initialize an empty array
+            let recipes = JSON.parse(localStorage.getItem('recipes')) || [];
+            
+            // Add the new recipe to the array
+            recipes.push(newRecipe);
+            
+            // Save the updated array back to local storage
+            localStorage.setItem('recipes', JSON.stringify(recipes));
 
             const statusMessage = document.getElementById('statusMessage');
             statusMessage.style.display = 'block';
             statusMessage.className = 'message success';
-            statusMessage.innerHTML = 'Recipe submitted successfully! Check the console for the recipe data.';
+            statusMessage.innerHTML = 'Recipe submitted successfully!';
             
             // Clear the form after a successful submission
             document.getElementById('recipeForm').reset();
+            
+            // You could also redirect back to the home page after submission
+            // window.location.href = "index.html";
         });
     </script>
 </body>
