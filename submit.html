@@ -122,6 +122,8 @@
         </nav>
     </div>
 
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     
@@ -151,14 +153,31 @@
             const ingredients = document.getElementById('ingredients').value.split('\n').filter(i => i.trim() !== '');
             const instructions = document.getElementById('instructions').value;
 
-            const newRecipe = {
+            // Initialize a recipe object with a default anonymous user
+            let newRecipe = {
                 title: recipeTitle,
                 ingredients: ingredients,
-                instructions: instructions
+                instructions: instructions,
+                submittedBy: "Anonymous",
+                piId: null
             };
 
             try {
-                // Add the new recipe to the 'recipes' collection in Firestore
+                // Try to authenticate the user to get their details
+                await Pi.init({ version: "2.0" });
+                const user = await Pi.authenticate();
+                
+                // If authentication is successful, update the recipe object
+                newRecipe.submittedBy = user.username;
+                newRecipe.piId = user.uid;
+
+            } catch (error) {
+                // If authentication fails, the recipe will be submitted anonymously
+                console.error("Pi authentication failed, submitting anonymously:", error);
+            }
+            
+            try {
+                // Add the new recipe (with or without user data) to the 'recipes' collection in Firestore
                 const docRef = await db.collection("recipes").add(newRecipe);
                 console.log("Document written with ID: ", docRef.id);
                 
