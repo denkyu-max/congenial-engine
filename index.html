@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi Eats</title>
+    <title>The Core Workshop</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -61,14 +61,72 @@
         .recipe-card ul {
             padding-left: 20px;
         }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        .modal h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .modal p {
+            font-size: 16px;
+            color: #555;
+        }
+        .modal a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .modal button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        .modal button:hover {
+            background-color: #0056b3;
+        }
+        .modal-checkbox-container {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Welcome to Pi Eats!</h1>
-            <p>Your community for sharing and discovering delicious recipes.</p>
-            <p><a href="submit.html">Share a new recipe!</a></p>
+            <h1>Welcome to The Core Workshop!</h1>
+            <p>Your community for sharing and discovering amazing projects.</p>
+            <p><a href="submit.html">Share a new project!</a></p>
         </header>
 
         <div id="auth-status">
@@ -79,12 +137,42 @@
             </section>
     </div>
 
+    <div id="consentModal" class="modal-overlay hidden">
+        <div class="modal">
+            <h2>Welcome to The Core Workshop!</h2>
+            <p>By using this app, you agree to our <a href="terms.html">Terms of Service</a> and acknowledge our <a href="privacy.html">Privacy Policy</a>.</p>
+            <div class="modal-checkbox-container">
+                <input type="checkbox" id="consentCheckbox">
+                <label for="consentCheckbox">I have read and agree to the terms.</label>
+            </div>
+            <button id="acceptButton" disabled>Accept & Continue</button>
+        </div>
+    </div>
+
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     
     <script>
+        // Check for legal consent on every page load
+        const consentModal = document.getElementById('consentModal');
+        const acceptButton = document.getElementById('acceptButton');
+        const consentCheckbox = document.getElementById('consentCheckbox');
+        
+        if (!localStorage.getItem('hasAcceptedTerms')) {
+            consentModal.classList.remove('hidden');
+        }
+
+        consentCheckbox.addEventListener('change', function() {
+            acceptButton.disabled = !this.checked;
+        });
+
+        acceptButton.addEventListener('click', function() {
+            localStorage.setItem('hasAcceptedTerms', 'true');
+            consentModal.classList.add('hidden');
+        });
+
         // Your Firebase project configuration
         const firebaseConfig = {
             apiKey: "AIzaSyB9FqSIurlifppOEVg3wZ0JEuQI_XcRWtQ",
@@ -116,13 +204,11 @@
                 console.error("Pi authentication failed:", error);
                 authStatus.className = 'error';
 
-                // Check for a specific error from the Pi SDK
                 if (error.name === "InvalidPlatformError") {
                     authStatus.innerHTML = `<p>Authentication failed: This app must be opened in the Pi Browser.</p>`;
                 } else if (error.name === "UserCancelledAuthentication") {
                     authStatus.innerHTML = `<p>Authentication was cancelled by the user. Please try again.</p>`;
                 } else {
-                    // This will catch any other error, including network issues or SDK bugs
                     authStatus.innerHTML = `<p>An unknown authentication error occurred. Your app functionality may be limited.</p>`;
                 }
             }
@@ -138,7 +224,7 @@
                 recipesList.innerHTML = ''; // Clear the list on every change
                 
                 if (snapshot.empty) {
-                    recipesList.innerHTML = '<p style="text-align: center;">No recipes submitted yet. Be the first to share!</p>';
+                    recipesList.innerHTML = '<p style="text-align: center;">No projects submitted yet. Be the first to share!</p>';
                 } else {
                     snapshot.forEach(doc => {
                         const recipe = doc.data();
@@ -167,5 +253,14 @@
         authenticateUser();
         window.onload = displayRecipes;
     </script>
+
+    <footer style="text-align: center; margin-top: 30px; padding: 15px 0; border-top: 1px solid #eee;">
+        <p>
+            <a href="privacy.html" style="color: #007bff; text-decoration: none;">Privacy Policy</a>
+            |
+            <a href="terms.html" style="color: #007bff; text-decoration: none;">Terms of Service</a>
+        </p>
+    </footer>
+
 </body>
 </html>
