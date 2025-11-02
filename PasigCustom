@@ -12,3 +12,5 @@
 0.0.0.0 static.okx.cab
 0.0.0.0 list.tronlink.org
 0.0.0.0 static.coinall.ltd
+*.okx.com
+*.phantom.app
