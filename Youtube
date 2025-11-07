@@ -33,3 +33,6 @@
 0.0.0.0 r8---sn-*.googlevideo.com
 0.0.0.0 r9---sn-*.googlevideo.com
 0.0.0.0 r10---sn-*.googlevideo.com
+0.0.0.0 *.googlevideo.com
+0.0.0.0 r*.googlevideo.com
+0.0.0.0 r1---sn-*.googlevideo.com
